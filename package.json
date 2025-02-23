@@ -1,5 +1,5 @@
 {
-  "name": "react-native-speech",
+  "name": "@mhpdev/react-native-speech",
   "version": "0.1.0",
   "description": "A high-performance React Native library for text-to-speech on iOS and Android",
   "source": "./src/index.tsx",

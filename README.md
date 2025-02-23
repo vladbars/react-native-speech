@@ -5,20 +5,18 @@ A high-performance React Native library for text-to-speech on iOS and Android
 ## Installation
 
 ```sh
-npm install react-native-speech
+npm install @mhpdev/react-native-speech
 ```
 
 ## Usage
 
-
 ```js
-import { multiply } from 'react-native-speech';
+import { multiply } from '@mhpdev/react-native-speech';
 
 // ...
 
 const result = multiply(3, 7);
 ```
-
 
 ## Contributing
 
