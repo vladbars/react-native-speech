@@ -10,13 +10,7 @@ npm install @mhpdev/react-native-speech
 
 ## Usage
 
-```js
-import { multiply } from '@mhpdev/react-native-speech';
-
-// ...
-
-const result = multiply(3, 7);
-```
+Developing...
 
 ## Contributing
 
