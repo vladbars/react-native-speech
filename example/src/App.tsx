@@ -1,5 +1,5 @@
-import { Text, View, StyleSheet } from 'react-native';
-import { multiply } from '@mhpdev/react-native-speech';
+import {Text, View, StyleSheet} from 'react-native';
+import {multiply} from '@mhpdev/react-native-speech';
 
 const result = multiply(3, 7);
 
