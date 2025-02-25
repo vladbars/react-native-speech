@@ -1,6 +1,13 @@
-
 #import "generated/RNSpeechSpec/RNSpeechSpec.h"
+#import "AVFoundation/AVFoundation.h"
 
-@interface Speech : NSObject <NativeSpeechSpec>
+using namespace JS::NativeSpeech;
 
+NS_ASSUME_NONNULL_BEGIN
+
+@interface Speech : NativeSpeechSpecBase <NativeSpeechSpec, AVSpeechSynthesizerDelegate>
+@property (nonatomic, strong) AVSpeechSynthesizer *synthesizer;
+@property (nonatomic, strong) NSDictionary *globalOptions;
 @end
+
+NS_ASSUME_NONNULL_END
