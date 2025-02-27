@@ -34,6 +34,14 @@ RCT_EXPORT_MODULE();
   return self;
 }
 
+- (void)cleanupPromises {
+  if (speakResolver) {
+    speakResolver(nil);
+    speakResolver = nil;
+    speakRejecter = nil;
+  }
+}
+
 - (NSDictionary *)getValidatedOptions:(VoiceOptions &)options {
   NSMutableDictionary *validatedOptions = [NSMutableDictionary new];
   
@@ -230,7 +238,7 @@ RCT_EXPORT_MODULE();
 
 - (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer 
   didStartSpeechUtterance:(AVSpeechUtterance *)utterance {
-  [self emitOnStart];
+  [self emitOnStart:@{@"id": @(utterance.hash)}];
 }
 
 - (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer
@@ -244,34 +252,24 @@ RCT_EXPORT_MODULE();
 
 - (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer
   didFinishSpeechUtterance:(AVSpeechUtterance *)utterance {
-  [self emitOnFinish];
-  
-  if (speakResolver) {
-    speakResolver(nil);
-    speakResolver = nil;
-    speakRejecter = nil;
-  }
+  [self emitOnFinish:@{@"id": @(utterance.hash)}];
+  [self cleanupPromises];
 }
 
 - (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer
   didPauseSpeechUtterance:(nonnull AVSpeechUtterance *)utterance {
-  [self emitOnPause];
+  [self emitOnPause:@{@"id": @(utterance.hash)}];
 }
 
 - (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer
   didContinueSpeechUtterance:(nonnull AVSpeechUtterance *)utterance {
-  [self emitOnResume];
+  [self emitOnResume:@{@"id": @(utterance.hash)}];
 }
 
 - (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer
   didCancelSpeechUtterance:(AVSpeechUtterance *)utterance {
-  [self emitOnStopped];
-  
-  if (speakResolver) {
-    speakResolver(nil);
-    speakResolver = nil;
-    speakRejecter = nil;
-  }
+  [self emitOnStopped:@{@"id": @(utterance.hash)}];
+  [self cleanupPromises];
 }
 
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:

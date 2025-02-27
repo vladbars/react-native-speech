@@ -2,11 +2,13 @@ import type {TurboModule} from 'react-native';
 import {TurboModuleRegistry} from 'react-native';
 import type {EventEmitter} from 'react-native/Libraries/Types/CodegenTypes';
 
-export interface ProgressProps {
+export interface EventProps {
   /**
    * The utterance ID
    */
   id: number;
+}
+export interface ProgressEventProps extends EventProps {
   /**
    * The text being spoken length
    */
@@ -27,7 +29,7 @@ export interface VoiceProps {
   identifier: string;
 }
 export interface VoiceOptions {
-  /** The language code to use (e.g., 'en-US', 'fr-FR') */
+  /** The language code to use (e.g., 'en', 'en-US', 'fr-FR') */
   language?: string;
   /** Volume level from 0.0 to 1.0 */
   volume?: number;
@@ -50,12 +52,13 @@ export interface Spec extends TurboModule {
   getAvailableVoices: (language: string) => Promise<VoiceProps[]>;
   speakWithOptions: (text: string, options: VoiceOptions) => Promise<void>;
 
-  readonly onStart: EventEmitter<void>;
-  readonly onFinish: EventEmitter<void>;
-  readonly onPause: EventEmitter<void>;
-  readonly onResume: EventEmitter<void>;
-  readonly onStopped: EventEmitter<void>;
-  readonly onProgress: EventEmitter<ProgressProps>;
+  readonly onError: EventEmitter<EventProps>;
+  readonly onStart: EventEmitter<EventProps>;
+  readonly onFinish: EventEmitter<EventProps>;
+  readonly onPause: EventEmitter<EventProps>;
+  readonly onResume: EventEmitter<EventProps>;
+  readonly onStopped: EventEmitter<EventProps>;
+  readonly onProgress: EventEmitter<ProgressEventProps>;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('Speech');

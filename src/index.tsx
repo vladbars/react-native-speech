@@ -1,8 +1,12 @@
+import type {
+  EventProps,
+  VoiceProps,
+  VoiceOptions,
+  ProgressEventProps,
+} from './NativeSpeech';
 import TurboSpeech from './NativeSpeech';
-import type {VoiceOptions, VoiceProps} from './NativeSpeech';
 
-export type {VoiceProps, VoiceOptions};
-
+export type {VoiceProps, VoiceOptions, EventProps, ProgressEventProps};
 export default class Speech {
   /**
    * Gets a list of all available voices on the device
@@ -20,15 +24,9 @@ export default class Speech {
   public static getAvailableVoices(language?: string): Promise<VoiceProps[]> {
     return TurboSpeech.getAvailableVoices(language ?? '');
   }
-
   /**
    * Sets the global options for all subsequent speak() calls
    * @param options - Voice configuration options
-   * @property {number} options.pitch - Voice pitch (0.5 to 2.0)
-   * @property {number} options.rate - Speech rate (0.0 to 1.0)
-   * @property {number} options.volume - Voice volume (0.0 to 1.0)
-   * @property {string} options.language - Voice language code
-   * @property {string} options.voice - Specific voice identifier
    * @example
    * Speech.initialize({
    *   pitch: 1.2,
@@ -40,7 +38,6 @@ export default class Speech {
   public static initialize(options: VoiceOptions): void {
     TurboSpeech.initialize(options);
   }
-
   /**
    * Resets all speech options to their default values
    * @example
@@ -49,7 +46,6 @@ export default class Speech {
   public static reset(): void {
     TurboSpeech.reset();
   }
-
   /**
    * Immediately stops any ongoing speech synthesis
    * @returns Promise<void> Resolves when speech is stopped
@@ -59,9 +55,9 @@ export default class Speech {
   public static stop(): Promise<void> {
     return TurboSpeech.stop();
   }
-
   /**
    * Pauses the current speech at the next word boundary
+   * @platform iOS
    * @returns Promise<boolean> Resolves to true if speech was paused, false if nothing to pause
    * @example
    * const isPaused = await Speech.pause();
@@ -70,9 +66,9 @@ export default class Speech {
   public static pause(): Promise<boolean> {
     return TurboSpeech.pause();
   }
-
   /**
    * Resumes previously paused speech
+   * @platform iOS
    * @returns Promise<boolean> Resolves to true if speech was resumed, false if nothing to resume
    * @example
    * const isResumed = await Speech.resume();
@@ -81,7 +77,6 @@ export default class Speech {
   public static resume(): Promise<boolean> {
     return TurboSpeech.resume();
   }
-
   /**
    * Speaks text using current global options
    * @param text - The text to synthesize
@@ -93,7 +88,6 @@ export default class Speech {
   public static isSpeaking(): Promise<boolean> {
     return TurboSpeech.isSpeaking();
   }
-
   /**
    * Speaks text using current global options
    * @param text - The text to synthesize
@@ -104,7 +98,6 @@ export default class Speech {
   public static speak(text: string): Promise<void> {
     return TurboSpeech.speak(text);
   }
-
   /**
    * Speaks text with custom options for this utterance only, for each one of the options that aren't provided, it will use the global one
    * @param text - The text to synthesize
@@ -125,10 +118,20 @@ export default class Speech {
   }
 
   /**
+   * Called when speech is errored
+   * @platform Android
+   * @example
+   * // Add listener
+   * const subscription = Speech.onError(({id}) => console.log('Failed speaking', id));
+   * // Later, cleanup when no longer needed
+   * subscription.remove();
+   */
+  public static onError = TurboSpeech.onError;
+  /**
    * Called when speech synthesis begins
    * @example
    * // Add listener
-   * const subscription = Speech.onStart(() => console.log('Started speaking'));
+   * const subscription = Speech.onStart(({id}) => console.log('Started speaking', id));
    * // Later, cleanup when no longer needed
    * subscription.remove();
    */
@@ -136,23 +139,25 @@ export default class Speech {
   /**
    * Called when speech synthesis completes normally
    * @example
-   * const subscription = Speech.onFinish(() => console.log('Finished speaking'));
+   * const subscription = Speech.onFinish(({id}) => console.log('Finished speaking', id));
    * // Cleanup
    * subscription.remove();
    */
   public static onFinish = TurboSpeech.onFinish;
   /**
    * Called when speech is paused
+   * @platform iOS
    * @example
-   * const subscription = Speech.onPause(() => console.log('Speech paused'));
+   * const subscription = Speech.onPause(({id}) => console.log('Speech paused', id));
    * // Cleanup
    * subscription.remove();
    */
   public static onPause = TurboSpeech.onPause;
   /**
    * Called when speech is resumed
+   * @platform iOS
    * @example
-   * const subscription = Speech.onResume(() => console.log('Speech resumed'));
+   * const subscription = Speech.onResume(({id}) => console.log('Speech resumed', id));
    * // Cleanup
    * subscription.remove();
    */
@@ -160,7 +165,7 @@ export default class Speech {
   /**
    * Called when speech is stopped
    * @example
-   * const subscription = Speech.onStopped(() => console.log('Speech stopped'));
+   * const subscription = Speech.onStopped(({id}) => console.log('Speech stopped', id));
    * // Cleanup
    * subscription.remove();
    */
@@ -168,13 +173,9 @@ export default class Speech {
   /**
    * Called during speech with progress information
    * @param callback Progress data containing current position
-   * @property {number} data.id - Unique identifier for the utterance
-   * @property {number} data.length - Total length of the current word
-   * @property {number} data.location - Current speaking position
    * @example
-   * const subscription = Speech.onProgress(({ id, length, location }) => {
-   *   const progress = Math.round((location / length) * 100);
-   *   console.log(`Speaking progress: ${progress}%`);
+   * const subscription = Speech.onProgress(progress => {
+   *   console.log(`Speaking progress`, progress);
    * });
    * // Cleanup when component unmounts or listener is no longer needed
    * subscription.remove();
