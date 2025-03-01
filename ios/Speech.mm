@@ -42,6 +42,21 @@ RCT_EXPORT_MODULE();
   }
 }
 
+- (NSDictionary *)getEventData:(AVSpeechUtterance *)utterance {
+  return @{
+    @"id": @(utterance.hash)
+  };
+}
+
+- (NSDictionary *)getVoiceItem:(AVSpeechSynthesisVoice *)voice {
+  return @{
+    @"name": voice.name,
+    @"language": voice.language,
+    @"identifier": voice.identifier,
+    @"quality": voice.quality == AVSpeechSynthesisVoiceQualityEnhanced ? @"Enhanced" : @"Default"
+  };
+}
+
 - (NSDictionary *)getValidatedOptions:(VoiceOptions &)options {
   NSMutableDictionary *validatedOptions = [NSMutableDictionary new];
   
@@ -74,6 +89,8 @@ RCT_EXPORT_MODULE();
     AVSpeechSynthesisVoice *voice = [AVSpeechSynthesisVoice voiceWithIdentifier:self.globalOptions[@"voice"]];
     if (voice) {
       utterance.voice = voice;
+    } else if (self.globalOptions[@"language"]) {
+      utterance.voice = [AVSpeechSynthesisVoice voiceWithLanguage:self.globalOptions[@"language"]];
     }
   } else {
     utterance.voice = [AVSpeechSynthesisVoice voiceWithLanguage:self.globalOptions[@"language"]];
@@ -110,12 +127,7 @@ RCT_EXPORT_MODULE();
       NSString *voiceLanguage = [voice.language lowercaseString];
 
       if ([voiceLanguage hasPrefix:lowercaseLanguage]) {
-        [voicesArray addObject:@{
-          @"name": voice.name,
-          @"language": voice.language,
-          @"quality": @(voice.quality),
-          @"identifier": voice.identifier,
-        }];
+        [voicesArray addObject:[self getVoiceItem:voice]];
       }
     }
     if ([voicesArray count] == 0) {
@@ -123,23 +135,13 @@ RCT_EXPORT_MODULE();
         NSString *voiceLanguage = [voice.language lowercaseString];
         
         if ([voiceLanguage containsString:lowercaseLanguage]) {
-          [voicesArray addObject:@{
-            @"name": voice.name,
-            @"language": voice.language,
-            @"quality": @(voice.quality),
-            @"identifier": voice.identifier,
-          }];
+          [voicesArray addObject:[self getVoiceItem:voice]];
         }
       }
     }
   } else {
     for (AVSpeechSynthesisVoice *voice in speechVoices) {
-      [voicesArray addObject:@{
-        @"name": voice.name,
-        @"language": voice.language,
-        @"quality": @(voice.quality),
-        @"identifier": voice.identifier,
-      }];
+      [voicesArray addObject:[self getVoiceItem:voice]];
     }
   }
   resolve(voicesArray);
@@ -187,13 +189,20 @@ RCT_EXPORT_MODULE();
     return;
   }
 
-  AVSpeechUtterance *utterance = [self getDefaultUtterance:text];
-
-  if (self.synthesizer.isSpeaking) {
-    [self.synthesizer stopSpeakingAtBoundary:AVSpeechBoundaryImmediate];
+  AVSpeechUtterance *utterance;
+ 
+  @try {
+    utterance = [self getDefaultUtterance:text];
+    
+    if (self.synthesizer.isSpeaking) {
+      [self.synthesizer stopSpeakingAtBoundary:AVSpeechBoundaryImmediate];
+    }
+    [self.synthesizer speakUtterance:utterance];
   }
-  
-  [self.synthesizer speakUtterance:utterance];
+  @catch (NSException *exception) {
+    [self emitOnError:[self getEventData:utterance]];
+    speakRejecter(@"speech_error", exception.reason, nil);
+  }
 }
 
 - (void)speakWithOptions:(NSString *)text
@@ -208,37 +217,46 @@ RCT_EXPORT_MODULE();
     speakRejecter(@"speech_error", @"Text cannot be null", nil);
     return;
   }
+  
+  AVSpeechUtterance *utterance;
 
-  AVSpeechUtterance *utterance = [self getDefaultUtterance:text];
-  NSDictionary *validatedOptions = [self getValidatedOptions:options];
+  @try {
+    utterance = [self getDefaultUtterance:text];
+    NSDictionary *validatedOptions = [self getValidatedOptions:options];
 
-  if (validatedOptions[@"voice"]) {
-    AVSpeechSynthesisVoice *voice = [AVSpeechSynthesisVoice voiceWithIdentifier:validatedOptions[@"voice"]];
-    if (voice) {
-      utterance.voice = voice;
-    } else if (validatedOptions[@"language"]) {
-      utterance.voice = [AVSpeechSynthesisVoice voiceWithLanguage:validatedOptions[@"language"]];
+    if (validatedOptions[@"voice"]) {
+      AVSpeechSynthesisVoice *voice = [AVSpeechSynthesisVoice voiceWithIdentifier:validatedOptions[@"voice"]];
+      
+      if (voice) {
+        utterance.voice = voice;
+      } else if (validatedOptions[@"language"]) {
+        utterance.voice = [AVSpeechSynthesisVoice voiceWithLanguage:validatedOptions[@"language"]];
+      }
     }
+    if (validatedOptions[@"pitch"]) {
+      utterance.pitchMultiplier = [validatedOptions[@"pitch"] floatValue];
+    }
+    if (validatedOptions[@"volume"]) {
+      utterance.volume = [validatedOptions[@"volume"] floatValue];
+    }
+    if (validatedOptions[@"rate"]) {
+      utterance.rate = [validatedOptions[@"rate"] floatValue];
+    }
+    
+    if (self.synthesizer.isSpeaking) {
+      [self.synthesizer stopSpeakingAtBoundary:AVSpeechBoundaryImmediate];
+    }
+    [self.synthesizer speakUtterance:utterance];
   }
-  if (validatedOptions[@"pitch"]) {
-    utterance.pitchMultiplier = [validatedOptions[@"pitch"] floatValue];
+  @catch (NSException *exception) {
+    [self emitOnError:[self getEventData:utterance]];
+    speakRejecter(@"speech_error", exception.reason, nil);
   }
-  if (validatedOptions[@"volume"]) {
-    utterance.volume = [validatedOptions[@"volume"] floatValue];
-  }
-  if (validatedOptions[@"rate"]) {
-    utterance.rate = [validatedOptions[@"rate"] floatValue];
-  }
-
-  if (self.synthesizer.isSpeaking) {
-    [self.synthesizer stopSpeakingAtBoundary:AVSpeechBoundaryImmediate];
-  }
-  [self.synthesizer speakUtterance:utterance];
 }
 
 - (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer 
   didStartSpeechUtterance:(AVSpeechUtterance *)utterance {
-  [self emitOnStart:@{@"id": @(utterance.hash)}];
+  [self emitOnStart:[self getEventData:utterance]];
 }
 
 - (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer
@@ -252,23 +270,23 @@ RCT_EXPORT_MODULE();
 
 - (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer
   didFinishSpeechUtterance:(AVSpeechUtterance *)utterance {
-  [self emitOnFinish:@{@"id": @(utterance.hash)}];
+  [self emitOnFinish:[self getEventData:utterance]];
   [self cleanupPromises];
 }
 
 - (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer
   didPauseSpeechUtterance:(nonnull AVSpeechUtterance *)utterance {
-  [self emitOnPause:@{@"id": @(utterance.hash)}];
+  [self emitOnPause:[self getEventData:utterance]];
 }
 
 - (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer
   didContinueSpeechUtterance:(nonnull AVSpeechUtterance *)utterance {
-  [self emitOnResume:@{@"id": @(utterance.hash)}];
+  [self emitOnResume:[self getEventData:utterance]];
 }
 
 - (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer
   didCancelSpeechUtterance:(AVSpeechUtterance *)utterance {
-  [self emitOnStopped:@{@"id": @(utterance.hash)}];
+  [self emitOnStopped:[self getEventData:utterance]];
   [self cleanupPromises];
 }
 

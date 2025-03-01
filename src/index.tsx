@@ -119,7 +119,6 @@ export default class Speech {
 
   /**
    * Called when speech is errored
-   * @platform Android
    * @example
    * // Add listener
    * const subscription = Speech.onError(({id}) => console.log('Failed speaking', id));

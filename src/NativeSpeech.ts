@@ -2,6 +2,8 @@ import type {TurboModule} from 'react-native';
 import {TurboModuleRegistry} from 'react-native';
 import type {EventEmitter} from 'react-native/Libraries/Types/CodegenTypes';
 
+export type VocieQuality = 'Default' | 'Enhanced';
+
 export interface EventProps {
   /**
    * The utterance ID
@@ -21,23 +23,31 @@ export interface ProgressEventProps extends EventProps {
 export interface VoiceProps {
   /** The name of the voice */
   name: string;
-  /** The quality level of the voice (0: Default, 1: Enhanced) */
-  quality: number;
+  /** The quality level of the voice */
+  quality: VocieQuality;
   /** The language code of the voice (e.g., 'en-US', 'fr-FR') */
   language: string;
   /** The unique identifier for the voice */
   identifier: string;
 }
 export interface VoiceOptions {
-  /** The language code to use (e.g., 'en', 'en-US', 'fr-FR') */
+  /** The language code to use (e.g., 'en', 'fr', 'en-US', 'fr-FR') */
   language?: string;
   /** Volume level from 0.0 to 1.0 */
   volume?: number;
   /** Specific voice identifier to use */
   voice?: string;
-  /** Pitch multiplier from 0.5 to 2.0 */
+  /**
+   * Pitch multiplier from 0.5 to 2.0
+   * - `Android`: (0.1 - 2.0)
+   * - `iOS`: (0.5 - 2.0)
+   */
   pitch?: number;
-  /** Speech rate (0.0 - 1.0) */
+  /**
+   * Speech rate
+   * - `Android`: (0.1 - 2.0)
+   * - `iOS`: (`AVSpeechUtteranceMinimumSpeechRate` - `AVSpeechUtteranceMaximumSpeechRate`)
+   */
   rate?: number;
 }
 
