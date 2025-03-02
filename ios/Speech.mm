@@ -5,8 +5,6 @@ using namespace JS::NativeSpeech;
 @implementation Speech
 {
   NSDictionary *defaultOptions;
-  RCTPromiseRejectBlock speakRejecter;
-  RCTPromiseResolveBlock speakResolver;
 }
 
 RCT_EXPORT_MODULE();
@@ -32,14 +30,6 @@ RCT_EXPORT_MODULE();
     self.globalOptions = [defaultOptions copy];
   }
   return self;
-}
-
-- (void)cleanupPromises {
-  if (speakResolver) {
-    speakResolver(nil);
-    speakResolver = nil;
-    speakRejecter = nil;
-  }
 }
 
 - (NSDictionary *)getEventData:(AVSpeechUtterance *)utterance {
@@ -181,11 +171,8 @@ RCT_EXPORT_MODULE();
     resolve:(RCTPromiseResolveBlock)resolve
     reject:(RCTPromiseRejectBlock)reject
 {
-  speakRejecter = reject;
-  speakResolver = resolve;
-
   if (!text) {
-    speakRejecter(@"speech_error", @"Text cannot be null", nil);
+    reject(@"speech_error", @"Text cannot be null", nil);
     return;
   }
 
@@ -193,15 +180,12 @@ RCT_EXPORT_MODULE();
  
   @try {
     utterance = [self getDefaultUtterance:text];
-    
-    if (self.synthesizer.isSpeaking) {
-      [self.synthesizer stopSpeakingAtBoundary:AVSpeechBoundaryImmediate];
-    }
     [self.synthesizer speakUtterance:utterance];
+    resolve(nil);
   }
   @catch (NSException *exception) {
     [self emitOnError:[self getEventData:utterance]];
-    speakRejecter(@"speech_error", exception.reason, nil);
+    reject(@"speech_error", exception.reason, nil);
   }
 }
 
@@ -210,11 +194,8 @@ RCT_EXPORT_MODULE();
     resolve:(RCTPromiseResolveBlock)resolve
     reject:(RCTPromiseRejectBlock)reject
 {
-  speakRejecter = reject;
-  speakResolver = resolve;
-
   if (!text) {
-    speakRejecter(@"speech_error", @"Text cannot be null", nil);
+    reject(@"speech_error", @"Text cannot be null", nil);
     return;
   }
   
@@ -242,15 +223,13 @@ RCT_EXPORT_MODULE();
     if (validatedOptions[@"rate"]) {
       utterance.rate = [validatedOptions[@"rate"] floatValue];
     }
-    
-    if (self.synthesizer.isSpeaking) {
-      [self.synthesizer stopSpeakingAtBoundary:AVSpeechBoundaryImmediate];
-    }
+
     [self.synthesizer speakUtterance:utterance];
+    resolve(nil);
   }
   @catch (NSException *exception) {
     [self emitOnError:[self getEventData:utterance]];
-    speakRejecter(@"speech_error", exception.reason, nil);
+    reject(@"speech_error", exception.reason, nil);
   }
 }
 
@@ -271,7 +250,6 @@ RCT_EXPORT_MODULE();
 - (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer
   didFinishSpeechUtterance:(AVSpeechUtterance *)utterance {
   [self emitOnFinish:[self getEventData:utterance]];
-  [self cleanupPromises];
 }
 
 - (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer
@@ -287,7 +265,6 @@ RCT_EXPORT_MODULE();
 - (void)speechSynthesizer:(AVSpeechSynthesizer *)synthesizer
   didCancelSpeechUtterance:(AVSpeechUtterance *)utterance {
   [self emitOnStopped:[self getEventData:utterance]];
-  [self cleanupPromises];
 }
 
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
