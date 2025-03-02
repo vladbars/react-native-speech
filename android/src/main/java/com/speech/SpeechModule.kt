@@ -277,12 +277,9 @@ class SpeechModule(reactContext: ReactApplicationContext) :
       return
     }
     ensureInitialized(promise) {
-      if (synthesizer.isSpeaking) {
-        synthesizer.stop()
-      }
       val params = getSpeechParams()
       val utteranceId = getUniqueID()
-      synthesizer.speak(text, TextToSpeech.QUEUE_FLUSH, params, utteranceId)
+      synthesizer.speak(text, TextToSpeech.QUEUE_ADD, params, utteranceId)
       promise.resolve(null)
     }
   }
@@ -293,9 +290,6 @@ class SpeechModule(reactContext: ReactApplicationContext) :
       return
     }
     ensureInitialized(promise) {
-      if (synthesizer.isSpeaking) {
-        synthesizer.stop()
-      }
       val newOptions = globalOptions.toMutableMap().apply {
         putAll(getValidatedOptions(options))
       }
@@ -304,7 +298,7 @@ class SpeechModule(reactContext: ReactApplicationContext) :
 
       val params = getSpeechParams()
       val utteranceId = getUniqueID()
-      synthesizer.speak(text, TextToSpeech.QUEUE_FLUSH, params, utteranceId)
+      synthesizer.speak(text, TextToSpeech.QUEUE_ADD, params, utteranceId)
       promise.resolve(null)
     }
   }
