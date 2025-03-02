@@ -1526,7 +1526,7 @@ PODS:
     - React-perflogger (= 0.78.0)
     - React-utils (= 0.78.0)
   - SocketRocket (0.7.1)
-  - Speech (0.1.0):
+  - Speech (1.0.0-beta.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1828,7 +1828,7 @@ SPEC CHECKSUMS:
   ReactCodegen: 008c319179d681a6a00966edfc67fda68f9fbb2e
   ReactCommon: 0c097b53f03d6bf166edbcd0915da32f3015dd90
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
-  Speech: ff75fbc8be724f0a2c0740626d60e9dde6b3a83e
+  Speech: d594bf21ce4bd90f412129ab1b5261d0f3ca93a8
   Yoga: afd04ff05ebe0121a00c468a8a3c8080221cb14c
 
 PODFILE CHECKSUM: 0f9f73e7d8db77378dc5b1b0cd12364c088a5a88
