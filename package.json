@@ -34,7 +34,8 @@
     "!**/__tests__",
     "!**/__fixtures__",
     "!**/__mocks__",
-    "!**/.*"
+    "!**/.*",
+    "app.plugin.js"
   ],
   "scripts": {
     "example": "yarn workspace react-native-speech-example",

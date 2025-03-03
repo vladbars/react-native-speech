@@ -2701,6 +2701,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@mhpdev/react-native-speech@link:../::locator=expo-speech-example%40workspace%3Aexpo-example":
+  version: 0.0.0-use.local
+  resolution: "@mhpdev/react-native-speech@link:../::locator=expo-speech-example%40workspace%3Aexpo-example"
+  languageName: node
+  linkType: soft
+
 "@mhpdev/react-native-speech@workspace:.":
   version: 0.0.0-use.local
   resolution: "@mhpdev/react-native-speech@workspace:."
@@ -7146,6 +7152,7 @@ __metadata:
   resolution: "expo-speech-example@workspace:expo-example"
   dependencies:
     "@babel/core": ^7.25.2
+    "@mhpdev/react-native-speech": "link:../"
     "@types/react": ~18.3.12
     expo: ~52.0.37
     expo-status-bar: ~2.0.1
