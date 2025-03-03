@@ -57,7 +57,7 @@ export default class Speech {
   }
   /**
    * Pauses the current speech at the next word boundary
-   * @platform iOS
+   * @note on Android, API 26+ required due to missing onRangeStart support
    * @returns Promise<boolean> Resolves to true if speech was paused, false if nothing to pause
    * @example
    * const isPaused = await Speech.pause();
@@ -68,7 +68,7 @@ export default class Speech {
   }
   /**
    * Resumes previously paused speech
-   * @platform iOS
+   * @note on Android, API 26+ required due to missing onRangeStart support
    * @returns Promise<boolean> Resolves to true if speech was resumed, false if nothing to resume
    * @example
    * const isResumed = await Speech.resume();
@@ -145,7 +145,7 @@ export default class Speech {
   public static onFinish = TurboSpeech.onFinish;
   /**
    * Called when speech is paused
-   * @platform iOS
+   * @note on Android, API 26+ required due to missing onRangeStart support
    * @example
    * const subscription = Speech.onPause(({id}) => console.log('Speech paused', id));
    * // Cleanup
@@ -154,7 +154,7 @@ export default class Speech {
   public static onPause = TurboSpeech.onPause;
   /**
    * Called when speech is resumed
-   * @platform iOS
+   * @note on Android, API 26+ required due to missing onRangeStart support
    * @example
    * const subscription = Speech.onResume(({id}) => console.log('Speech resumed', id));
    * // Cleanup
@@ -171,6 +171,7 @@ export default class Speech {
   public static onStopped = TurboSpeech.onStopped;
   /**
    * Called during speech with progress information
+   * @note on Android, API 26+ required due to missing onRangeStart support
    * @param callback Progress data containing current position
    * @example
    * const subscription = Speech.onProgress(progress => {

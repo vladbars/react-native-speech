@@ -2,6 +2,7 @@ package com.speech
 
 import java.util.UUID
 import java.util.Locale
+import android.os.Build
 import android.os.Bundle
 import android.speech.tts.Voice
 import android.annotation.SuppressLint
@@ -33,6 +34,9 @@ class SpeechModule(reactContext: ReactApplicationContext) :
       "language" to Locale.getDefault().toLanguageTag()
     )
   }
+  private val queueLock = Any()
+
+  private val isSupportedPausing = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
 
   private lateinit var synthesizer: TextToSpeech
 
@@ -41,6 +45,11 @@ class SpeechModule(reactContext: ReactApplicationContext) :
   private val pendingOperations = mutableListOf<Pair<() -> Unit, Promise>>()
 
   private var globalOptions: MutableMap<String, Any> = defaultOptions.toMutableMap()
+
+  private var isPaused = false
+  private var isResuming = false
+  private var currentQueueIndex = -1
+  private val speechQueue = mutableListOf<SpeechQueueItem>()
 
   init {
     initializeTTS()
@@ -81,7 +90,6 @@ class SpeechModule(reactContext: ReactApplicationContext) :
 
   private fun getVoiceItem(voice: Voice): ReadableMap {
     val quality = if (voice.quality > Voice.QUALITY_NORMAL) "Enhanced" else "Default"
-
     return Arguments.createMap().apply {
       putString("quality", quality)
       putString("name", voice.name)
@@ -92,6 +100,15 @@ class SpeechModule(reactContext: ReactApplicationContext) :
 
   private fun getUniqueID(): String {
     return UUID.randomUUID().toString()
+  }
+
+  private fun resetQueueState() {
+    synchronized(queueLock) {
+      speechQueue.clear()
+      currentQueueIndex = -1
+      isPaused = false
+      isResuming = false
+    }
   }
 
   private fun initializeTTS() {
@@ -105,27 +122,66 @@ class SpeechModule(reactContext: ReactApplicationContext) :
       if (isInitialized) {
         synthesizer.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
           override fun onStart(utteranceId: String) {
-            emitOnStart(getEventData(utteranceId))
-          }
-
-          override fun onDone(utteranceId: String) {
-            emitOnFinish(getEventData(utteranceId))
-          }
-
-          override fun onError(utteranceId: String) {
-            emitOnError(getEventData(utteranceId))
-          }
-
-          override fun onStop(utteranceId: String, interrupted: Boolean) {
-            emitOnStopped(getEventData(utteranceId))
-          }
-
-          override fun onRangeStart(utteranceId: String, start: Int, end: Int, frame: Int) {
-            val data = getEventData(utteranceId).apply {
-              putInt("length", end - start)
-              putInt("location", start)
+            synchronized(queueLock) {
+              speechQueue.find { it.utteranceId == utteranceId }?.let { item ->
+                item.status = SpeechStatus.SPEAKING
+                if (isResuming && item.position > 0) {
+                  emitOnResume(getEventData(utteranceId))
+                  isResuming = false
+                } else {
+                  emitOnStart(getEventData(utteranceId))
+                }
+              }
             }
-            emitOnProgress(data)
+          }
+          override fun onDone(utteranceId: String) {
+            synchronized(queueLock) {
+              speechQueue.find { it.utteranceId == utteranceId }?.let { item ->
+                item.status = SpeechStatus.COMPLETED
+                emitOnFinish(getEventData(utteranceId))
+                if (!isPaused) {
+                  currentQueueIndex++
+                  processNextQueueItem()
+                }
+              }
+            }
+          }
+          override fun onError(utteranceId: String) {
+            synchronized(queueLock) {
+              speechQueue.find { it.utteranceId == utteranceId }?.let { item ->
+                item.status = SpeechStatus.ERROR
+                emitOnError(getEventData(utteranceId))
+                if (!isPaused) {
+                  currentQueueIndex++
+                  processNextQueueItem()
+                }
+              }
+            }
+          }
+          override fun onStop(utteranceId: String, interrupted: Boolean) {
+            synchronized(queueLock) {
+              speechQueue.find { it.utteranceId == utteranceId }?.let { item ->
+                if (isPaused) {
+                  item.status = SpeechStatus.PAUSED
+                  emitOnPause(getEventData(utteranceId))
+                } else {
+                  item.status = SpeechStatus.COMPLETED
+                  emitOnStopped(getEventData(utteranceId))
+                }
+              }
+            }
+          }
+          override fun onRangeStart(utteranceId: String, start: Int, end: Int, frame: Int) {
+            synchronized(queueLock) {
+              speechQueue.find { it.utteranceId == utteranceId }?.let { item ->
+                item.position = item.offset + start
+                val data = getEventData(utteranceId).apply {
+                  putInt("length", end - start)
+                  putInt("location", item.position)
+                }
+                emitOnProgress(data)
+              }
+            }
           }
         })
         applyGlobalOptions()
@@ -176,6 +232,30 @@ class SpeechModule(reactContext: ReactApplicationContext) :
     }
   }
 
+  private fun applyOptions(options: Map<String, Any>) {
+    val tempOptions = globalOptions.toMutableMap().apply {
+      putAll(options)
+    }
+    tempOptions["language"]?.let {
+      val locale = Locale.forLanguageTag(it as String)
+      synthesizer.setLanguage(locale)
+    }
+    tempOptions["pitch"]?.let {
+      synthesizer.setPitch(it as Float)
+    }
+    tempOptions["rate"]?.let {
+      synthesizer.setSpeechRate(it as Float)
+    }
+    tempOptions["voice"]?.let { voiceId ->
+      synthesizer.voices?.forEach { voice ->
+        if (voice.name == voiceId) {
+          synthesizer.setVoice(voice)
+          return@forEach
+        }
+      }
+    }
+  }
+
   private fun getValidatedOptions(options: ReadableMap): Map<String, Any> {
     val validated = mutableMapOf<String, Any>()
     if (options.hasKey("voice")) {
@@ -195,6 +275,42 @@ class SpeechModule(reactContext: ReactApplicationContext) :
       validated["rate"] = options.getDouble("rate").toFloat().coerceIn(0.1f, 2.0f)
     }
     return validated
+  }
+
+  private fun processNextQueueItem() {
+    synchronized(queueLock) {
+      if (isPaused) return
+
+      if (currentQueueIndex in 0 until speechQueue.size) {
+        val item = speechQueue[currentQueueIndex]
+        if (item.status == SpeechStatus.PENDING || item.status == SpeechStatus.PAUSED) {
+          applyOptions(item.options)
+          val params = getSpeechParams()
+          val textToSpeak: String
+
+          if (item.status == SpeechStatus.PAUSED) {
+            item.offset = item.position
+            textToSpeak = item.text.substring(item.offset)
+            isResuming = true
+          } else {
+            item.offset = 0
+            textToSpeak = item.text
+          }
+          val queueMode = if (isResuming) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD
+          synthesizer.speak(textToSpeak, queueMode, params, item.utteranceId)
+
+          if (currentQueueIndex == speechQueue.size - 1) {
+            applyGlobalOptions()
+          }
+        } else {
+          currentQueueIndex++
+          processNextQueueItem()
+        }
+      } else {
+        currentQueueIndex = -1
+        applyGlobalOptions()
+      }
+    }
   }
 
   override fun initialize(options: ReadableMap) {
@@ -246,14 +362,21 @@ class SpeechModule(reactContext: ReactApplicationContext) :
 
   override fun isSpeaking(promise: Promise) {
     ensureInitialized(promise) {
-      promise.resolve(synthesizer.isSpeaking)
+      promise.resolve(synthesizer.isSpeaking || isPaused)
     }
   }
 
   override fun stop(promise: Promise) {
     ensureInitialized(promise) {
-      if (synthesizer.isSpeaking) {
+      if (synthesizer.isSpeaking || isPaused) {
         synthesizer.stop()
+        synchronized(queueLock) {
+          if (currentQueueIndex in speechQueue.indices) {
+            val item = speechQueue[currentQueueIndex]
+            emitOnStopped(getEventData(item.utteranceId))
+          }
+          resetQueueState()
+        }
       }
       promise.resolve(null)
     }
@@ -261,13 +384,34 @@ class SpeechModule(reactContext: ReactApplicationContext) :
 
   override fun pause(promise: Promise) {
     ensureInitialized(promise) {
-      promise.resolve(false)
+      if (!isSupportedPausing || isPaused || !synthesizer.isSpeaking || speechQueue.isEmpty()) {
+        promise.resolve(false)
+      } else {
+        isPaused = true
+        synthesizer.stop()
+        promise.resolve(true)
+      }
     }
   }
 
   override fun resume(promise: Promise) {
     ensureInitialized(promise) {
-      promise.resolve(false)
+      if (!isSupportedPausing || !isPaused || speechQueue.isEmpty() || currentQueueIndex < 0) {
+        promise.resolve(false)
+        return@ensureInitialized
+      }
+      synchronized(queueLock) {
+        val pausedItemIndex = speechQueue.indexOfFirst { it.status == SpeechStatus.PAUSED }
+        if (pausedItemIndex >= 0) {
+          currentQueueIndex = pausedItemIndex
+          isPaused = false
+          processNextQueueItem()
+          promise.resolve(true)
+        } else {
+          isPaused = false
+          promise.resolve(false)
+        }
+      }
     }
   }
 
@@ -277,9 +421,15 @@ class SpeechModule(reactContext: ReactApplicationContext) :
       return
     }
     ensureInitialized(promise) {
-      val params = getSpeechParams()
       val utteranceId = getUniqueID()
-      synthesizer.speak(text, TextToSpeech.QUEUE_ADD, params, utteranceId)
+      val queueItem = SpeechQueueItem(text = text, options = emptyMap(), utteranceId = utteranceId)
+      synchronized(queueLock) {
+        speechQueue.add(queueItem)
+        if (!synthesizer.isSpeaking && !isPaused) {
+          currentQueueIndex = speechQueue.size - 1
+          processNextQueueItem()
+        }
+      }
       promise.resolve(null)
     }
   }
@@ -290,15 +440,16 @@ class SpeechModule(reactContext: ReactApplicationContext) :
       return
     }
     ensureInitialized(promise) {
-      val newOptions = globalOptions.toMutableMap().apply {
-        putAll(getValidatedOptions(options))
-      }
-      globalOptions = newOptions
-      applyGlobalOptions()
-
-      val params = getSpeechParams()
       val utteranceId = getUniqueID()
-      synthesizer.speak(text, TextToSpeech.QUEUE_ADD, params, utteranceId)
+      val validatedOptions = getValidatedOptions(options)
+      val queueItem = SpeechQueueItem(text = text, options = validatedOptions, utteranceId = utteranceId)
+      synchronized(queueLock) {
+        speechQueue.add(queueItem)
+        if (!synthesizer.isSpeaking && !isPaused) {
+          currentQueueIndex = speechQueue.size - 1
+          processNextQueueItem()
+        }
+      }
       promise.resolve(null)
     }
   }
@@ -308,6 +459,7 @@ class SpeechModule(reactContext: ReactApplicationContext) :
     if (::synthesizer.isInitialized) {
       synthesizer.stop()
       synthesizer.shutdown()
+      resetQueueState()
     }
   }
 }
