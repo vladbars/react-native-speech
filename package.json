@@ -149,7 +149,8 @@
   },
   "eslintIgnore": [
     "node_modules/",
-    "lib/"
+    "lib/",
+    "app.plugin.js"
   ],
   "prettier": {
     "arrowParens": "avoid",
