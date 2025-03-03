@@ -38,6 +38,7 @@
   ],
   "scripts": {
     "example": "yarn workspace react-native-speech-example",
+    "expo-example": "yarn workspace expo-speech-example",
     "test": "jest",
     "typecheck": "tsc",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
@@ -66,6 +67,7 @@
   "devDependencies": {
     "@commitlint/config-conventional": "^17.0.2",
     "@evilmartians/lefthook": "^1.5.0",
+    "@expo/config-plugins": "^9.0.16",
     "@react-native-community/cli": "15.0.1",
     "@react-native/eslint-config": "^0.73.1",
     "@release-it/conventional-changelog": "^9.0.2",
@@ -94,7 +96,8 @@
     "react-native": "*"
   },
   "workspaces": [
-    "example"
+    "example",
+    "expo-example"
   ],
   "packageManager": "yarn@3.6.1",
   "jest": {
