@@ -120,15 +120,6 @@ RCT_EXPORT_MODULE();
         [voicesArray addObject:[self getVoiceItem:voice]];
       }
     }
-    if ([voicesArray count] == 0) {
-      for (AVSpeechSynthesisVoice *voice in speechVoices) {
-        NSString *voiceLanguage = [voice.language lowercaseString];
-        
-        if ([voiceLanguage containsString:lowercaseLanguage]) {
-          [voicesArray addObject:[self getVoiceItem:voice]];
-        }
-      }
-    }
   } else {
     for (AVSpeechSynthesisVoice *voice in speechVoices) {
       [voicesArray addObject:[self getVoiceItem:voice]];

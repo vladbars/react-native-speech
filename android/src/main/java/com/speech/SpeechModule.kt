@@ -335,20 +335,11 @@ class SpeechModule(reactContext: ReactApplicationContext) :
         return@ensureInitialized
       }
       if (language != null) {
+        val lowercaseLanguage = language.lowercase()
         voices.forEach { voice ->
-          val lcLanguage = language.lowercase(Locale.getDefault())
-          val voiceLanguage = voice.locale.toLanguageTag().lowercase(Locale.getDefault())
-          if (voiceLanguage.startsWith(lcLanguage)) {
+          val voiceLanguage = voice.locale.toLanguageTag().lowercase()
+          if (voiceLanguage.startsWith(lowercaseLanguage)) {
             voicesArray.pushMap(getVoiceItem(voice))
-          }
-        }
-        if (voicesArray.size() == 0) {
-          voices.forEach { voice ->
-            val lowerCaseLanguage = language.lowercase(Locale.getDefault())
-            val voiceLanguage = voice.locale.toLanguageTag().lowercase(Locale.getDefault())
-            if (voiceLanguage.contains(lowerCaseLanguage)) {
-              voicesArray.pushMap(getVoiceItem(voice))
-            }
           }
         }
       } else {
