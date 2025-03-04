@@ -1,1 +1,1 @@
-module.exports = require('./lib/commonjs/expo-plugin/withReactNativeSpeech');
+module.exports = require('./lib/commonjs/expo-plugin');
