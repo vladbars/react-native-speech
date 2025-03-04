@@ -7,10 +7,11 @@ import type {
 import TurboSpeech from './NativeSpeech';
 
 export type {VoiceProps, VoiceOptions, EventProps, ProgressEventProps};
+
 export default class Speech {
   /**
    * Gets a list of all available voices on the device
-   * @param language - Optional language code to filter voices (e.g., 'en', 'en-US', 'fr-FR').
+   * @param language - Optional language code to filter voices (e.g., 'en', 'fr', 'en-US', 'fr-FR').
    *                  If not provided, returns all available voices.
    * @returns Promise<VoiceProps[]> Array of voice properties matching the language filter
    * @example
@@ -47,7 +48,7 @@ export default class Speech {
     TurboSpeech.reset();
   }
   /**
-   * Immediately stops any ongoing speech synthesis
+   * Immediately stops any ongoing or in queue speech synthesis
    * @returns Promise<void> Resolves when speech is stopped
    * @example
    * await Speech.stop();
@@ -78,12 +79,11 @@ export default class Speech {
     return TurboSpeech.resume();
   }
   /**
-   * Speaks text using current global options
-   * @param text - The text to synthesize
-   * @returns Promise<void> Resolves when speech completes
-   * @throws If text is null or empty
+   * Checks if speech is currently being synthesized
+   * @returns Promise<boolean> Resolves to true if speaking or paused, false otherwise
    * @example
-   * await Speech.speak('Hello, world!');
+   * const speaking = await Speech.isSpeaking();
+   * console.log(speaking ? 'Speaking' : 'Not speaking');
    */
   public static isSpeaking(): Promise<boolean> {
     return TurboSpeech.isSpeaking();
@@ -92,6 +92,7 @@ export default class Speech {
    * Speaks text using current global options
    * @param text - The text to synthesize
    * @returns Promise<void> Resolves when speech completes
+   * @throws If text is null or undefined
    * @example
    * await Speech.speak('Hello, world!');
    */
@@ -99,10 +100,11 @@ export default class Speech {
     return TurboSpeech.speak(text);
   }
   /**
-   * Speaks text with custom options for this utterance only, for each one of the options that aren't provided, it will use the global one
+   * Speaks text with custom options for this utterance only. Uses global options for any settings not provided.
    * @param text - The text to synthesize
    * @param options - Voice options overriding global settings
    * @returns Promise<void> Resolves when speech completes
+   * @throws If text is null or undefined
    * @example
    * await Speech.speakWithOptions('Hello!', {
    *   pitch: 1.5,
@@ -118,10 +120,10 @@ export default class Speech {
   }
 
   /**
-   * Called when speech is errored
+   * Called when an error occurs during speech synthesis
    * @example
    * // Add listener
-   * const subscription = Speech.onError(({id}) => console.log('Failed speaking', id));
+   * const subscription = Speech.onError(({id}) => console.log('Speech error', id));
    * // Later, cleanup when no longer needed
    * subscription.remove();
    */
@@ -136,7 +138,7 @@ export default class Speech {
    */
   public static onStart = TurboSpeech.onStart;
   /**
-   * Called when speech synthesis completes normally
+   * Called when speech synthesis completes successfully
    * @example
    * const subscription = Speech.onFinish(({id}) => console.log('Finished speaking', id));
    * // Cleanup
@@ -172,7 +174,6 @@ export default class Speech {
   /**
    * Called during speech with progress information
    * @note on Android, API 26+ required due to missing onRangeStart support
-   * @param callback Progress data containing current position
    * @example
    * const subscription = Speech.onProgress(progress => {
    *   console.log(`Speaking progress`, progress);
