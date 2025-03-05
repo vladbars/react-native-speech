@@ -11,8 +11,8 @@ A high-performance text-to-speech library built for bare React Native and Expo, 
 
 ## Preview
 
-|                                                      <center>Android</center>                                                       |                                                      <center>iOS</center>                                                       |
-| :---------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------: |
+|                                                         <center>Android</center>                                                         |                                                           <center>iOS</center>                                                           |
+| :--------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------: |
 | <video src="https://github.com/user-attachments/assets/424e5852-caf8-464d-b583-198a5555502d" controls width="100%" height="500"></video> | <video src="https://github.com/user-attachments/assets/ce464d9e-7a23-40cb-894e-9f6306f84365" width="100%" height="500" controls></video> |
 
 ## Features
@@ -31,33 +31,33 @@ A high-performance text-to-speech library built for bare React Native and Expo, 
 
 ### Bare React Native
 
+Install the package using either npm or Yarn:
+
 ```sh
 npm install @mhpdev/react-native-speech
 ```
 
-Or using Yarn:
+Or with Yarn:
 
 ```sh
-
-https://github.com/user-attachments/assets/fe25a269-1ff4-486e-9ad0-c0c2ef828def
-
-
 yarn add @mhpdev/react-native-speech
 ```
 
 ### Expo
 
-Step 1:
+For Expo projects, follow these steps:
 
-```sh
-npx expo install @mhpdev/react-native-speech
-```
+1. Install the package:
 
-Step 2 (since it is not supported on Expo Go):
+   ```sh
+   npx expo install @mhpdev/react-native-speech
+   ```
 
-```sh
-npx expo prebuild
-```
+2. Since it is not supported on Expo Go, run:
+
+   ```sh
+   npx expo prebuild
+   ```
 
 ## Usage
 
