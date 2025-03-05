@@ -13,7 +13,7 @@ A high-performance text-to-speech library built for bare React Native and Expo, 
 
 |                                                      <center>Android</center>                                                       |                                                      <center>iOS</center>                                                       |
 | :---------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------: |
-| <video src="https://github.com/mhpdev-com/react-native-speech/docs/android-preview.mp4" controls width="100%" height="500"></video> | <video src="https://github.com/mhpdev-com/react-native-speech/docs/ios-preview.mp4" width="100%" height="500" controls></video> |
+| <video src="https://github.com/user-attachments/assets/424e5852-caf8-464d-b583-198a5555502d" controls width="100%" height="500"></video> | <video src="https://github.com/user-attachments/assets/ce464d9e-7a23-40cb-894e-9f6306f84365" width="100%" height="500" controls></video> |
 
 ## Features
 
@@ -38,6 +38,10 @@ npm install @mhpdev/react-native-speech
 Or using Yarn:
 
 ```sh
+
+https://github.com/user-attachments/assets/fe25a269-1ff4-486e-9ad0-c0c2ef828def
+
+
 yarn add @mhpdev/react-native-speech
 ```
 
