@@ -12,7 +12,7 @@ npm install @mhpdev/react-native-speech
 
 ## Contributing
 
-See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
+See the [contributing guide](./docs/CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
 
 ## License
 
