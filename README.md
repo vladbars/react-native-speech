@@ -2,18 +2,18 @@
 
 A high-performance text-to-speech library built for bare React Native and Expo, compatible with Android and iOS. It enables seamless speech management and provides events for detailed synthesis management.
 
-> **Only New Architecture**: This library is currently compatible with the new architecture. If you're using React Native 0.76 or higher, it is already enabled. However, if your React Native version is between 0.68 and 0.75, you need to enable it first. [Click here if you need help enabling the new architecture](https://github.com/reactwg/react-native-new-architecture/blob/main/docs/enable-apps.md)
-
-<br/>
 <div align="center">
   <a href="./docs/USAGE.md">Documentation</a> · <a href="./example/">Example</a>
 </div>
+<br/>
+
+> **Only New Architecture**: This library is currently compatible with the new architecture. If you're using React Native 0.76 or higher, it is already enabled. However, if your React Native version is between 0.68 and 0.75, you need to enable it first. [Click here if you need help enabling the new architecture](https://github.com/reactwg/react-native-new-architecture/blob/main/docs/enable-apps.md)
 
 ## Preview
 
-|                                <center>Android</center>                                 |                                <center>iOS</center>                                |
-| :-------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------: |
-| <br><video src="./docs//android-preview.mp4" controls width="250" height="500"></video> | <br><video src="./docs/ios-preview.mp4" width="250" height="500" controls></video> |
+|                                                      <center>Android</center>                                                       |                                                      <center>iOS</center>                                                       |
+| :---------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------: |
+| <video src="https://github.com/mhpdev-com/react-native-speech/docs/android-preview.mp4" controls width="100%" height="500"></video> | <video src="https://github.com/mhpdev-com/react-native-speech/docs/ios-preview.mp4" width="100%" height="500" controls></video> |
 
 ## Features
 
