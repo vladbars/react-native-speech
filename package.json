@@ -140,6 +140,7 @@
   "eslintIgnore": [
     "node_modules/",
     "lib/",
+    "docs/",
     "app.plugin.js"
   ],
   "prettier": {
