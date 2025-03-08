@@ -11,9 +11,9 @@ A high-performance text-to-speech library built for bare React Native and Expo, 
 
 ## Preview
 
-|                                                         <center>Android</center>                                                         |                                                           <center>iOS</center>                                                           |
-| :--------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------: |
-| <video src="https://github.com/user-attachments/assets/424e5852-caf8-464d-b583-198a5555502d" controls width="100%" height="500"></video> | <video src="https://github.com/user-attachments/assets/ce464d9e-7a23-40cb-894e-9f6306f84365" width="100%" height="500" controls></video> |
+|                                                                                                          <center>Android</center>                                                                                                           |                                                                                                          <center>iOS</center>                                                                                                           |
+| :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| <video src="https://github.com/user-attachments/assets/424e5852-caf8-464d-b583-198a5555502d" controls width="100%" height="500"></video> [Android Preview](https://github.com/user-attachments/assets/424e5852-caf8-464d-b583-198a5555502d) | <video src="https://github.com/user-attachments/assets/ce464d9e-7a23-40cb-894e-9f6306f84365" width="100%" height="500" controls></video> [iOS Preview](https://github.com/user-attachments/assets/ce464d9e-7a23-40cb-894e-9f6306f84365) |
 
 ## Features
 
