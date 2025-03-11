@@ -38,7 +38,18 @@
   "keywords": [
     "react-native",
     "ios",
-    "android"
+    "android",
+    "react-native-speech",
+    "react-native-tts",
+    "react-native-text-to-speech",
+    "text-to-speech",
+    "tts",
+    "voice",
+    "speech",
+    "highlighted",
+    "highlight-text",
+    "highlighter",
+    "react-native-highlighted-text"
   ],
   "repository": {
     "type": "git",
