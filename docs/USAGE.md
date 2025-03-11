@@ -24,6 +24,9 @@
       - [**onStopped**](#onstopped)
       - [**onProgress**](#onprogress)
   - [HighlightedText](#highlightedtext)
+    - [Importing the Component](#importing-the-component)
+    - [Properties](#properties)
+    - [Example](#example)
   - [Example Application](#example-application)
 
 ---
@@ -352,20 +355,101 @@ progressSubscription.remove();
 
 ## HighlightedText
 
-For displaying highlighted text, such as the currently synthesized text, the library exports the `HighlightedText` component, which provides a customizable solution for this purpose:
+The `HighlightedText` component allows you to display text with customizable highlighted segments. This is especially useful for emphasizing parts of text (e.g., the currently synthesized text). In addition to the specialized properties listed below, the component accepts all standard React Native `<Text>` props.
+
+### Importing the Component
 
 ```tsx
 import {HighlightedText} from '@mhpdev/react-native-speech';
 ```
 
-**Properties:**
+### Properties
 
-- `text`: The text to be displayed.
-- `highlightedStyle`: Style to be applied to the highlighted segments (will apply on all highlighted segments).
-- `highlights`: An array of objects defining the `start` and `end` positions, along with a specific `style` for each highlighted segment.
-- `onHighlightedPress`: Callback function that is triggered when a highlighted segment is pressed. Receives an object with `text`, `start`, and `end` properties.
+- **text**  
+  _Type:_ `string`  
+  The full text content to be displayed.
 
-Additionally, it supports all other React Native Text component props. To learn more about how to use the component, [check out here](../example/src/views/RootView.tsx).
+- **highlightedStyle**  
+  _Type:_ `StyleProp<TextStyle>`  
+  The base style applied to all highlighted segments. This style can be overridden by segment-specific styles defined in the `highlights` prop.
+
+- **highlights**  
+  _Type:_ `Array<{ start: number; end: number; style?: StyleProp<TextStyle> }>`  
+  An array of objects that define which parts of the text should be highlighted. Each object must include:
+
+  - **start**: The starting character index of the segment.
+  - **end**: The ending character index of the segment.
+  - **style** (optional): Custom style for this particular segment.
+
+- **onHighlightedPress**  
+  _Type:_ `(segment: { text: string; start: number; end: number }) => void`  
+  A callback function that is invoked when a highlighted segment is pressed. The function receives an object containing:
+  - **text**: The text content of the pressed segment.
+  - **start**: The starting index of the segment.
+  - **end**: The ending index of the segment.
+
+### Example
+
+```tsx
+import React from 'react';
+import {
+  HighlightedText,
+  type HighlightedSegmentProps,
+  type HighlightedSegmentArgs,
+} from '@mhpdev/react-native-speech';
+import {Alert, SafeAreaView, StyleSheet} from 'react-native';
+
+const TEXT = 'This is a sample text where some parts are highlighted.';
+
+const ExampleHighlightedText: React.FC = () => {
+  const highlights: Array<HighlightedSegmentProps> = [
+    {start: 10, end: 21},
+    {start: 43, end: 54, style: styles.customHighlightedStyle},
+  ];
+
+  const onHighlightedPress = React.useCallback(
+    ({text, start, end}: HighlightedSegmentArgs) =>
+      Alert.alert(
+        'Highlighted Segment',
+        `Segment "${text}" starts at ${start} and ends at ${end}`,
+      ),
+    [],
+  );
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <HighlightedText
+        text={TEXT}
+        style={styles.text}
+        highlights={highlights}
+        highlightedStyle={styles.highlighted}
+        onHighlightedPress={onHighlightedPress}
+      />
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 16,
+  },
+  text: {
+    fontSize: 16,
+  },
+  highlighted: {
+    backgroundColor: 'yellow',
+    fontWeight: 'bold',
+  },
+  customHighlightedStyle: {
+    color: 'white',
+    backgroundColor: 'blue',
+  },
+});
+
+export default ExampleHighlightedText;
+```
+
+To learn more about how to use the component, [check out here](../example/src/views/RootView.tsx).
 
 ## Example Application
 
