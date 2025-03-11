@@ -4,7 +4,7 @@ import Button from '../components/Button';
 import {Alert, StyleSheet, Text, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Speech, {
-  HighlightText,
+  HighlightedText,
   type HighlightedSegmentArgs,
   type HighlightedSegmentProps,
 } from '@mhpdev/react-native-speech';
@@ -100,7 +100,7 @@ const RootView: React.FC = () => {
     <SafeAreaView style={[gs.flex, gs.p10]}>
       <View style={gs.flex}>
         <Text style={gs.title}>Introduction</Text>
-        <HighlightText
+        <HighlightedText
           text={Introduction}
           style={gs.paragraph}
           highlights={highlights}

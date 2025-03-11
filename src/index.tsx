@@ -11,4 +11,4 @@ export type {
   HighlightedSegmentArgs,
   HighlightedSegmentProps,
 } from './components/types';
-export {default as HighlightText} from './components/HighlightText';
+export {default as HighlightedText} from './components/HighlightedText';
