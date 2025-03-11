@@ -96,7 +96,11 @@ const HighlightedText: React.FC<HighlightedTextProps> = ({
     [getHighlightedSegmentStyle, onHighlightedPress],
   );
 
-  return <Text {...rest}>{segments.map(renderText)}</Text>;
+  return (
+    <Text style={style} {...rest}>
+      {segments.map(renderText)}
+    </Text>
+  );
 };
 
 export default HighlightedText;
