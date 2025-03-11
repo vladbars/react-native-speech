@@ -23,6 +23,7 @@
       - [**onResume**](#onresume)
       - [**onStopped**](#onstopped)
       - [**onProgress**](#onprogress)
+  - [HighlightedText](#highlightedtext)
   - [Example Application](#example-application)
 
 ---
@@ -63,7 +64,7 @@ For Expo projects, follow these steps:
 
 ## API Overview
 
-The library exports a `Speech` class that provides methods for speech synthesis and event handling:
+For text-to-speech, the library exports the `Speech` class, which provides methods for speech synthesis and event handling:
 
 ```tsx
 import Speech from '@mhpdev/react-native-speech';
@@ -348,6 +349,23 @@ progressSubscription.remove();
 ```
 
 ---
+
+## HighlightedText
+
+For displaying highlighted text, such as the currently synthesized text, the library exports the `HighlightedText` component, which provides a customizable solution for this purpose:
+
+```tsx
+import {HighlightedText} from '@mhpdev/react-native-speech';
+```
+
+**Properties:**
+
+- `text`: The text to be displayed.
+- `highlightedStyle`: Style to be applied to the highlighted segments (will apply on all highlighted segments).
+- `highlights`: An array of objects defining the `start` and `end` positions, along with a specific `style` for each highlighted segment.
+- `onHighlightedPress`: Callback function that is triggered when a highlighted segment is pressed. Receives an object with `text`, `start`, and `end` properties.
+
+Additionally, it supports all other React Native Text component props. To learn more about how to use the component, [check out here](../example/src/views/RootView.tsx).
 
 ## Example Application
 

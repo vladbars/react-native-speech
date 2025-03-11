@@ -21,7 +21,9 @@ A high-performance text-to-speech library built for bare React Native and Expo, 
 
 - 🎛️ Provides essential and useful methods for full control over synthesis
 
-- 😎 Support for `pause` and `resume`, along with `onResume` and `onPause` events, for Android too. (If you have prior experience using text-to-speech, particularly on Android, note that unlike iOS, it doesn’t natively support these features, and this library handles them itself)
+- 😎 Support for `pause` and `resume`, along with `onResume` and `onPause` events, for Android too (On Android, unlike iOS—which does not natively support these features—this library implements its own handling)
+
+- 🖍️ Provides a customizable [HighlightedText](./docs/USAGE.md#highlightedtext) component to display the currently spoken text
 
 - 📡 Offers useful events for more precise control over synthesis
 
