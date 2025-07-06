@@ -1,4 +1,8 @@
-# react-native-speech
+<p align="center">
+  <a href="https://mhpdev.com" target="_blank">
+    <img src="./docs/banner.png" alt="React Native Full Responsive Banner" style="max-width:100%;height:auto;" />
+  </a>
+</p>
 
 A high-performance text-to-speech library built for bare React Native and Expo, compatible with Android and iOS. It enables seamless speech management and provides events for detailed synthesis management.
 
