@@ -21,17 +21,17 @@ A high-performance text-to-speech library built for bare React Native and Expo, 
 
 ## Features
 
-- 🚀 High-performance library created with Turbo Modules for both Android and iOS
+- 🚀 &nbsp;High-performance library built with Turbo Modules for Android and iOS
 
-- 🎛️ Provides essential and useful methods for full control over synthesis
+- 🎛️ &nbsp;Provides essential methods for full control over synthesis
 
-- 😎 Support for `pause` and `resume`, along with `onResume` and `onPause` events, for Android too (On Android, unlike iOS—which does not natively support these features—this library implements its own handling)
+- 🪄 &nbsp;Support for the `pause` and `resume` methods—including the `onPause` and `onResume` events—on Android as well. Unlike iOS, which natively provides these features, this library implements its own handling on Android (API 26+ required)
 
-- 🖍️ Provides a customizable [HighlightedText](./docs/USAGE.md#highlightedtext) component to display the currently spoken text
+- 📡 &nbsp;Offers useful events for more precise control over synthesis
 
-- 📡 Offers useful events for more precise control over synthesis
+- 💅 &nbsp;Includes a customizable [HighlightedText](./docs/USAGE.md#highlightedtext) component to display the currently spoken text
 
-- ✅ Completely type-safe and written in TypeScript (on the React Native side)
+- ✅ &nbsp;Fully type-safe and written in TypeScript
 
 ## Installation
 
