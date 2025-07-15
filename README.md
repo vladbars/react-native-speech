@@ -112,6 +112,18 @@ const styles = StyleSheet.create({
 
 To become more familiar with the usage of the library, check out the [example project](./example/).
 
+## Testing
+
+To mock the package's methods and components using the default mock configuration provided, follow these steps:
+
+- Create a file named `@mhpdev/react-native-speech.ts` inside your `__mocks__` directory.
+
+- Copy the following code into that file:
+
+  ```ts
+  export * from '@mhpdev/react-native-speech/jest';
+  ```
+
 ## Contributing
 
 See the [contributing guide](./docs/CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
