@@ -120,8 +120,8 @@ To mock the package's methods and components using the default mock configuratio
 
 - Copy the following code into that file:
 
-  ```ts
-  export * from '@mhpdev/react-native-speech/jest';
+  ```js
+  module.exports = require('@mhpdev/react-native-speech/jest');
   ```
 
 ## Contributing
