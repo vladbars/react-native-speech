@@ -49,6 +49,12 @@ Or with Yarn:
 yarn add @mhpdev/react-native-speech
 ```
 
+For iOS, navigate to the ios directory and install the pods:
+
+```sh
+cd ios && pod install
+```
+
 ### Expo
 
 For Expo projects, follow these steps:
