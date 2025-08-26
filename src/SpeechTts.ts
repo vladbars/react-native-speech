@@ -1,7 +1,7 @@
+import type {VoiceOptions, VoiceProps} from './NativeSpeech';
 import TurboSpeech from './NativeSpeech';
-import type {VoiceProps, VoiceOptions} from './NativeSpeech';
 
-export default class Speech {
+export default class SpeechTts {
   /**
    * Gets a list of all available voices on the device
    * @param language - Optional language code to filter voices (e.g., 'en', 'fr', 'en-US', 'fr-FR').
