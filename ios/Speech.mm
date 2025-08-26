@@ -20,6 +20,12 @@ RCT_EXPORT_MODULE();
     _synthesizer = [[AVSpeechSynthesizer alloc] init];
     _synthesizer.delegate = self;
     
+    NSError *error = nil;
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
+    if (!error) {
+      [[AVAudioSession sharedInstance] setActive:YES error:nil];
+    }
+
     defaultOptions = @{
       @"pitch": @(1.0),
       @"volume": @(1.0),

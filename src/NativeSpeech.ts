@@ -1,6 +1,6 @@
-import type {TurboModule} from 'react-native';
-import {TurboModuleRegistry} from 'react-native';
-import type {EventEmitter} from 'react-native/Libraries/Types/CodegenTypes';
+import type { TurboModule } from 'react-native';
+import { TurboModuleRegistry } from 'react-native';
+import type { EventEmitter } from 'react-native/Libraries/Types/CodegenTypes';
 
 export type VocieQuality = 'Default' | 'Enhanced';
 
@@ -71,4 +71,4 @@ export interface Spec extends TurboModule {
   readonly onProgress: EventEmitter<ProgressEventProps>;
 }
 
-export default TurboModuleRegistry.getEnforcing<Spec>('Speech');
+export default TurboModuleRegistry.getEnforcing<Spec>('SpeechTts');
