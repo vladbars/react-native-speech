@@ -1,14 +1,14 @@
-export {default} from './Speech';
+export {default} from './SpeechTts';
 
+export {default as HighlightedText} from './components/HighlightedText';
 export type {
-  VoiceProps,
-  EventProps,
-  VoiceOptions,
-  ProgressEventProps,
-} from './NativeSpeech';
-export type {
-  HighlightedTextProps,
   HighlightedSegmentArgs,
   HighlightedSegmentProps,
+  HighlightedTextProps,
 } from './components/types';
-export {default as HighlightedText} from './components/HighlightedText';
+export type {
+  EventProps,
+  ProgressEventProps,
+  VoiceOptions,
+  VoiceProps,
+} from './NativeSpeech';

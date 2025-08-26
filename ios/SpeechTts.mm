@@ -1,8 +1,8 @@
-#import "Speech.h"
+#import "SpeechTts.h"
 
 using namespace JS::NativeSpeech;
 
-@implementation Speech
+@implementation SpeechTts
 {
   NSDictionary *defaultOptions;
 }
